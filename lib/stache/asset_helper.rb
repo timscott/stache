@@ -13,7 +13,12 @@ module Stache
           end
         end
 
-        template = template_finder.call(true) rescue template_finder.call(false)
+        # template = template_finder.call(true) rescue template_finder.call(false)
+        # Disable caching to ensure the template will includes it's source.
+        template = lookup_context.disable_cache do
+          template_finder.call(true) rescue template_finder.call(false)
+        end
+
         template_id = (Stache.include_path_in_id) ? source.gsub("/", '_') : source.to_s.split("/").last
         content_tag(:script, template.source.html_safe, options.reverse_merge(type: 'text/html', id: template_id.dasherize.underscore))
 
